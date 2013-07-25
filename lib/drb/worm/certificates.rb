@@ -48,6 +48,17 @@ class DRb::Worm::Certificates
     cert
   end
 
+  def create_certificate_signing_request key
+    csr = OpenSSL::X509::Request.new
+    csr.version = 0
+    csr.subject = @subject
+    csr.public_key = key.public_key
+
+    csr.sign key, OpenSSL::Digest::SHA1.new
+
+    csr
+  end
+
   def create_key
     @key = OpenSSL::PKey::RSA.new @key_size
   end

@@ -31,6 +31,18 @@ class TestDRbWormCertificates < Minitest::Test
     assert_equal '/CN=test/CN=drb-worm/CN=segment7/DC=net', cert.subject.to_s
   end
 
+  def test_create_certificate_signing_request
+    key = @ca.create_key
+
+    csr = @ca.create_certificate_signing_request key
+
+    assert_equal key.public_key.to_text, csr.public_key.to_text
+
+    assert_equal '/CN=test/CN=drb-worm/CN=segment7/DC=net', csr.subject.to_s
+
+    assert csr.verify key.public_key
+  end
+
   def test_create_key
     key = @ca.create_key
 
