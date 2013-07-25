@@ -4,13 +4,13 @@ require 'drb/worm'
 class TestDRbWormCertificates < Minitest::Test
 
   def setup
-    @ca = DRb::Worm::Certificates.new 'test', 1024
+    @c = DRb::Worm::Certificates.new 'test', 1024
   end
 
   def test_create_ca_certificate
-    key = @ca.create_key
+    key = @c.create_key
 
-    ca_cert = @ca.create_ca_certificate
+    ca_cert = @c.create_ca_certificate
 
     expected = '/CN=test/CN=drb-worm/CN=segment7/DC=net'
 
@@ -21,9 +21,9 @@ class TestDRbWormCertificates < Minitest::Test
   end
 
   def test_create_certificate
-    key = @ca.create_key
+    key = @c.create_key
 
-    cert = @ca.create_certificate key
+    cert = @c.create_certificate key
 
     assert_equal key.public_key.to_text, cert.public_key.to_text
 
@@ -32,9 +32,9 @@ class TestDRbWormCertificates < Minitest::Test
   end
 
   def test_create_certificate_signing_request
-    key = @ca.create_key
+    key = @c.create_key
 
-    csr = @ca.create_certificate_signing_request key
+    csr = @c.create_certificate_signing_request key
 
     assert_equal key.public_key.to_text, csr.public_key.to_text
 
@@ -43,8 +43,26 @@ class TestDRbWormCertificates < Minitest::Test
     assert csr.verify key.public_key
   end
 
+  def test_create_child_certificate
+    child     = DRb::Worm::Certificates.new 'child', 1024
+    child_key = child.create_key
+    csr       = child.create_certificate_signing_request child_key
+
+    ca_key = @c.create_key
+    @c.create_ca_certificate
+
+    cert = @c.create_child_certificate csr
+
+    assert_equal '/CN=test/CN=drb-worm/CN=segment7/DC=net',  cert.issuer.to_s
+    assert_equal '/CN=child/CN=drb-worm/CN=segment7/DC=net', cert.subject.to_s
+
+    assert_equal 1, cert.serial
+
+    assert cert.verify ca_key.public_key
+  end
+
   def test_create_key
-    key = @ca.create_key
+    key = @c.create_key
 
     assert_kind_of OpenSSL::PKey::RSA, key
   end
