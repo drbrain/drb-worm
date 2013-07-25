@@ -13,16 +13,13 @@ class DRb::Worm::Certificates
   end
 
   def create_ca_certificate
-    @ca_cert = OpenSSL::X509::Certificate.new
-    @ca_cert.version = 2
+    @ca_cert = create_certificate @key
     @ca_cert.serial  = 0
 
     @ca_cert.not_before = Time.now
     @ca_cert.not_after  = Time.utc 2038, 01, 19, 03, 14, 07 # for ruby 1.8
 
-    @ca_cert.public_key = @key.public_key
     @ca_cert.issuer     = @subject
-    @ca_cert.subject    = @subject
 
     extension_factory = OpenSSL::X509::ExtensionFactory.new
     extension_factory.subject_certificate = @ca_cert
@@ -38,6 +35,17 @@ class DRb::Worm::Certificates
     @ca_cert.sign @key, OpenSSL::Digest::SHA1.new
 
     @ca_cert
+  end
+
+  def create_certificate key
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 2
+
+    cert.public_key = @key.public_key
+    cert.subject    = @subject
+    cert.public_key = key.public_key
+
+    cert
   end
 
   def create_key
