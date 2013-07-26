@@ -34,7 +34,7 @@ class TestDRbWormCertificates < Minitest::Test
   def test_create_certificate_signing_request
     key = @c.create_key
 
-    csr_pem = @c.create_certificate_signing_request key
+    csr_pem = @c.create_certificate_signing_request
 
     csr = OpenSSL::X509::Request.new csr_pem
 
@@ -46,9 +46,10 @@ class TestDRbWormCertificates < Minitest::Test
   end
 
   def test_create_child_certificate
-    child     = DRb::Worm::Certificates.new 'child', 1024
-    child_key = child.create_key
-    csr       = child.create_certificate_signing_request child_key
+    child = DRb::Worm::Certificates.new 'child', 1024
+
+    child.create_key
+    csr = child.create_certificate_signing_request
 
     ca_key = @c.create_key
     @c.create_ca_certificate

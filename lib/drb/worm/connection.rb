@@ -71,7 +71,7 @@ class DRb::Worm::Connection
     child = DRb::Worm::Certificates.new @name
 
     @key     = child.create_key
-    csr_pem  = child.create_certificate_signing_request @key
+    csr_pem  = child.create_certificate_signing_request
     cert_pem = @ca.create_child_certificate csr_pem
 
     @certificate = OpenSSL::X509::Certificate.new cert_pem

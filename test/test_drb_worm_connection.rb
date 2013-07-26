@@ -11,8 +11,8 @@ class TestDRbWormConnection < Minitest::Test
     ca = create_ca
 
     child = DRb::Worm::Certificates.new 'test', 1024
-    key = child.create_key
-    csr = child.create_certificate_signing_request key
+    child.create_key
+    csr = child.create_certificate_signing_request
 
     cert_pem = ca.create_child_certificate csr
 

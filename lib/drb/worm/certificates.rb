@@ -18,8 +18,9 @@ require 'openssl'
 #
 #   child = DRb::Worm::Certificates.new 'child'
 #   child.create_key
-#   csr = child.create_certificate_signing_request child.key
+#   csr = child.create_certificate_signing_request
 #
+#   # ca is a CA mode Certificates instance as created above
 #   cert_pem = ca.create_child_certificate csr
 #   cert = OpenSSL::X509::Certificate.new cert_pem
 
@@ -85,7 +86,7 @@ class DRb::Worm::Certificates
   # compatibility), the subject from the name created in #initialize and
   # public key from +key+ filled in.
 
-  def create_certificate key
+  def create_certificate key # :nodoc:
     cert = OpenSSL::X509::Certificate.new
     cert.version = 2
 
@@ -98,14 +99,14 @@ class DRb::Worm::Certificates
   end
 
   ##
-  # Creates a certificate signing request for +key+.  Returns the CSR in PEM
-  # format (as a String).
+  # Creates a certificate signing request.  Returns the CSR in PEM format (as
+  # a String).
 
-  def create_certificate_signing_request key
+  def create_certificate_signing_request
     csr = OpenSSL::X509::Request.new
     csr.version = 0
     csr.subject = @subject
-    csr.public_key = key.public_key
+    csr.public_key = @key.public_key
 
     csr.sign key, OpenSSL::Digest::SHA1.new
 
