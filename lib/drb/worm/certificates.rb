@@ -1,9 +1,44 @@
 require 'openssl'
 
+##
+# Certificates handles Certificate Authority (CA) and Certificate Signing
+# Request (CSR) duties.  Certificates may be used in either mode depending
+# upon which messages are sent to it.
+#
+# For either mode, create_key must be called before setting up a CA or
+# creating a CSR.
+#
+# CA mode:
+#
+#   ca = DRb::Worm::Certificates.new 'example'
+#   ca.create_key
+#   ca.create_ca_certificate
+#
+# CSR mode:
+#
+#   child = DRb::Worm::Certificates.new 'child'
+#   child.create_key
+#   csr = child.create_certificate_signing_request child.key
+#
+#   cert_pem = ca.create_child_certificate csr
+#   cert = OpenSSL::X509::Certificate.new cert_pem
+
 class DRb::Worm::Certificates
 
+  ##
+  # The CA certificate.  This is set after create_ca_certificate is sent.
+
   attr_reader :ca_cert
+
+  ##
+  # The RSA keypair.  This is set after create_key is sent.
+
   attr_reader :key
+
+  ##
+  # Creates a new Certificates object appending +name+ to the pre-configured
+  # namespace of CN=drb-worm/CN=segment7/DC=net.  The +key_size+ sets the RSA
+  # key size.
 
   def initialize name, key_size = 4096
     @subject =
@@ -17,6 +52,9 @@ class DRb::Worm::Certificates
     @certificate_store = nil
     @key               = nil
   end
+
+  ##
+  # Creates a CA certificate for use by create_child_certificate
 
   def create_ca_certificate
     @serial = 0
@@ -42,6 +80,11 @@ class DRb::Worm::Certificates
     @ca_cert
   end
 
+  ##
+  # Creates a X509 Certificate with an expiry time in 2038 (for ruby 1.8
+  # compatibility), the subject from the name created in #initialize and
+  # public key from +key+ filled in.
+
   def create_certificate key
     cert = OpenSSL::X509::Certificate.new
     cert.version = 2
@@ -54,6 +97,10 @@ class DRb::Worm::Certificates
     cert
   end
 
+  ##
+  # Creates a certificate signing request for +key+.  Returns the CSR in PEM
+  # format (as a String).
+
   def create_certificate_signing_request key
     csr = OpenSSL::X509::Request.new
     csr.version = 0
@@ -64,6 +111,11 @@ class DRb::Worm::Certificates
 
     csr.to_pem
   end
+
+  ##
+  # Creates a child certificate which is signed by the CA certificate for
+  # the CSR in PEM format, +csr_pem+.  Returns the signed certificate in PEM
+  # format (as a String).
 
   def create_child_certificate csr_pem
     csr = OpenSSL::X509::Request.new csr_pem
@@ -90,6 +142,9 @@ class DRb::Worm::Certificates
 
     cert.to_pem
   end
+
+  ##
+  # Creates an RSA keypair
 
   def create_key
     @key = OpenSSL::PKey::RSA.new @key_size
