@@ -1,4 +1,5 @@
 require 'drb'
+require 'drb/ssl'
 
 class DRb::Worm
 
@@ -7,4 +8,6 @@ class DRb::Worm
 end
 
 require 'drb/worm/certificates'
+require 'drb/worm/connection'
+require 'drb/worm/master'
 

@@ -12,6 +12,10 @@ class DRb::Worm::Certificates
     @key_size = key_size
 
     @serial = 0
+
+    @ca_cert           = nil
+    @certificate_store = nil
+    @key               = nil
   end
 
   def create_ca_certificate
@@ -58,10 +62,12 @@ class DRb::Worm::Certificates
 
     csr.sign key, OpenSSL::Digest::SHA1.new
 
-    csr
+    csr.to_pem
   end
 
-  def create_child_certificate csr
+  def create_child_certificate csr_pem
+    csr = OpenSSL::X509::Request.new csr_pem
+
     cert = create_certificate csr.public_key
 
     cert.serial  = @serial += 1
@@ -82,7 +88,7 @@ class DRb::Worm::Certificates
 
     cert.sign @key, OpenSSL::Digest::SHA1.new
 
-    cert
+    cert.to_pem
   end
 
   def create_key

@@ -34,7 +34,9 @@ class TestDRbWormCertificates < Minitest::Test
   def test_create_certificate_signing_request
     key = @c.create_key
 
-    csr = @c.create_certificate_signing_request key
+    csr_pem = @c.create_certificate_signing_request key
+
+    csr = OpenSSL::X509::Request.new csr_pem
 
     assert_equal key.public_key.to_text, csr.public_key.to_text
 
@@ -51,7 +53,11 @@ class TestDRbWormCertificates < Minitest::Test
     ca_key = @c.create_key
     @c.create_ca_certificate
 
-    cert = @c.create_child_certificate csr
+    cert_pem = @c.create_child_certificate csr
+
+    assert_kind_of String, cert_pem
+
+    cert = OpenSSL::X509::Certificate.new cert_pem
 
     assert_equal '/CN=test/CN=drb-worm/CN=segment7/DC=net',  cert.issuer.to_s
     assert_equal '/CN=child/CN=drb-worm/CN=segment7/DC=net', cert.subject.to_s
