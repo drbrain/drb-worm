@@ -1,8 +1,8 @@
 ##
 # Connection bootstraps the SSL certificates for the connections between the
 # nodes in the worm.  Anyone knowing an address of one of the nodes can
-# bootstrap themselves into the network.  SSL is used only for privacy, not
-# for security.
+# bootstrap themselves into the network.  SSL is used only for casual privacy
+# and provides no security.
 #
 # Example:
 #
@@ -13,7 +13,7 @@
 #   c.ca = master.ca
 #
 #   s = c.start_service
-#   p s.uri
+#   puts s.uri
 
 class DRb::Worm::Connection
 
@@ -91,7 +91,8 @@ class DRb::Worm::Connection
   end
 
   ##
-  # Starts a DRb SSL service for this node and returns the service.
+  # Starts a DRb SSL service with no front object for this node and returns
+  # the service.
   #
   # You must set the #ca for this connection before starting the service.
 
