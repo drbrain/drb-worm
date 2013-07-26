@@ -1,14 +1,46 @@
+##
+# Connection bootstraps the SSL certificates for the connections between the
+# nodes in the worm.  Anyone knowing an address of one of the nodes can
+# bootstrap themselves into the network.  SSL is used only for privacy, not
+# for security.
+#
+# Example:
+#
+#   # master is an instance of DRb::Worm::Master, a Connection subclass
+#   master = DRb::DRbObject.new_with_uri "drb://master.example:port"
+#
+#   c = DRb::Worm::Connection.new
+#   c.ca = master.ca
+#
+#   s = c.start_service
+#   p s.uri
+
 class DRb::Worm::Connection
+
+  ##
+  # A Certificates object configured to be the Certificate Authority for a
+  # network of nodes.  This can be a DRb reference.
 
   attr_accessor :ca
 
+  ##
+  # This connection's local certificate.  It will be created through
+  # start_service.
+
   attr_reader :certificate
+
+  ##
+  # This connection's local RSA keypair.  It will be created through
+  # start_service.
 
   attr_reader :key
 
+  ##
+  # The name for this node's certificate.
+
   attr_reader :name
 
-  def initialize
+  def initialize # :nodoc:
     @name = "#{Socket.gethostname}-#{$PID}"
 
     @ca          = nil
@@ -16,7 +48,10 @@ class DRb::Worm::Connection
     @key         = nil
   end
 
-  def certificate_store
+  ##
+  # The OpenSSL::X509::Store containing the network's CA certificate.
+
+  def certificate_store # :nodoc:
     @certificate_store ||=
       begin
         # use local certificate
@@ -28,7 +63,11 @@ class DRb::Worm::Connection
       end
   end
 
-  def create_certificate
+  ##
+  # Creates a new keypair and certificate for this node.  You must set #ca
+  # before creating the certificate.
+
+  def create_certificate # :nodoc:
     child = DRb::Worm::Certificates.new @name
 
     @key     = child.create_key
@@ -38,7 +77,10 @@ class DRb::Worm::Connection
     @certificate = OpenSSL::X509::Certificate.new cert_pem
   end
 
-  def ssl_config
+  ##
+  # The DRb SSL configuration for this node.
+
+  def ssl_config # :nodoc:
     {
       SSLCertificate:        @certificate,
       SSLPrivateKey:         @key,
@@ -47,6 +89,11 @@ class DRb::Worm::Connection
         OpenSSL::SSL::VERIFY_PEER | OpenSSL::SSL::VERIFY_FAIL_IF_NO_PEER_CERT,
     }
   end
+
+  ##
+  # Starts a DRb SSL service for this node and returns the service.
+  #
+  # You must set the #ca for this connection before starting the service.
 
   def start_service
     create_certificate
