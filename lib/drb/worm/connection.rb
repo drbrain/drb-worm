@@ -99,7 +99,7 @@ class DRb::Worm::Connection
   def start_service
     create_certificate
 
-    DRb.start_service 'drbssl://localhost:0', nil, ssl_config
+    DRb.start_service 'drbssl://:0', nil, ssl_config
   end
 
 end
