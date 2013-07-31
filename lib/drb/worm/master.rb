@@ -25,7 +25,7 @@ class DRb::Worm::Master < DRb::Worm::Connection
   # Creates a Certificates object that is set up as a Certificate Authority.
 
   def create_ca # :nodoc:
-    @ca = DRb::Worm::Certificates.new 'master'
+    @ca = DRb::Worm::Certificates.new 'master', @key_size
     @ca.create_key
     @ca.create_ca_certificate
   end

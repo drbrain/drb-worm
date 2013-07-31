@@ -27,6 +27,11 @@ require 'openssl'
 class DRb::Worm::Certificates
 
   ##
+  # The default key size for RSA keys
+
+  KEY_SIZE = 4096
+
+  ##
   # The CA certificate.  This is set after create_ca_certificate is sent.
 
   attr_reader :ca_cert
@@ -41,7 +46,7 @@ class DRb::Worm::Certificates
   # namespace of CN=drb-worm/CN=segment7/DC=net.  The +key_size+ sets the RSA
   # key size.
 
-  def initialize name, key_size = 4096
+  def initialize name, key_size = KEY_SIZE
     @subject =
       OpenSSL::X509::Name.parse "CN=#{name}/CN=drb-worm/CN=segment7/DC=net"
 

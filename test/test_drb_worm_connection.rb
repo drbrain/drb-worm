@@ -5,6 +5,7 @@ class TestDRbWormConnection < Minitest::Test
 
   def setup
     @c = DRb::Worm::Connection.new
+    @c.key_size = 1024
   end
 
   def test_certificate_store

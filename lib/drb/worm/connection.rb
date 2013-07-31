@@ -36,6 +36,11 @@ class DRb::Worm::Connection
   attr_reader :key
 
   ##
+  # Sets the key size for RSA keypairs.
+
+  attr_accessor :key_size
+
+  ##
   # The name for this node's certificate.
 
   attr_reader :name
@@ -46,6 +51,7 @@ class DRb::Worm::Connection
     @ca          = nil
     @certificate = nil
     @key         = nil
+    @key_size    = DRb::Worm::Certificates::KEY_SIZE
   end
 
   ##
@@ -68,7 +74,7 @@ class DRb::Worm::Connection
   # before creating the certificate.
 
   def create_certificate # :nodoc:
-    child = DRb::Worm::Certificates.new @name
+    child = DRb::Worm::Certificates.new @name, @key_size
 
     @key     = child.create_key
     csr_pem  = child.create_certificate_signing_request
