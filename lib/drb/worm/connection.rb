@@ -46,7 +46,7 @@ class DRb::Worm::Connection
   attr_reader :name
 
   def initialize # :nodoc:
-    @name = "#{Socket.gethostname}-#{$PID}"
+    @name = "#{Socket.gethostname}-#{$$}"
 
     @ca          = nil
     @certificate = nil
