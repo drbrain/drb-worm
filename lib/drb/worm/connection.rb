@@ -7,7 +7,7 @@
 # Example:
 #
 #   # master is an instance of DRb::Worm::Master, a Connection subclass
-#   master = DRb::DRbObject.new_with_uri "drb://master.example:port"
+#   master = DRb::DRbObject.new_with_uri "druby://master.example:port"
 #
 #   c = DRb::Worm::Connection.new
 #   c.ca = master.ca
