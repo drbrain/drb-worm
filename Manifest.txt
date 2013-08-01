@@ -6,9 +6,11 @@ Rakefile
 lib/drb/worm.rb
 lib/drb/worm/certificates.rb
 lib/drb/worm/connection.rb
+lib/drb/worm/daemon.rb
 lib/drb/worm/master.rb
 lib/drb/worm/victim.rb
 test/test_drb_worm_certificates.rb
 test/test_drb_worm_connection.rb
+test/test_drb_worm_daemon.rb
 test/test_drb_worm_master.rb
 test/test_drb_worm_victim.rb
